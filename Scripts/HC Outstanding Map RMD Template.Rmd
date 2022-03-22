@@ -1,0 +1,303 @@
+---
+title: "South Lanarkshire Home Care Requests (DUMMY DATA)"
+output: 
+  flexdashboard::flex_dashboard:
+    mathjax: null
+    theme: paper
+    orientation: rows
+    vertical-layout: fill
+---
+
+<!-- ####################################################################### -->
+<style>    
+
+.navbar {
+  background-color:#433684; 
+    border-color:#433684;
+}
+
+.navbar-inverse .navbar-nav > li > a:hover,
+.navbar-inverse .navbar-nav > li > a:focus {
+    background-color: #5343a3;
+}
+
+.navbar-inverse .navbar-nav > .active > a,
+.navbar-inverse .navbar-nav > .active > a:hover,
+.navbar-inverse .navbar-nav > .active > a:focus {
+  background-color: #312760;
+}
+
+.nav-tabs-custom > .nav-tabs > li.active {
+border-top-color: #433684}
+
+.section.sidebar {
+  background-color: #cfc9e9;
+}
+
+.chart-title {
+    font-weight: 800;
+}
+
+.chart-title {
+    border-bottom: 1px solid rgb(0 0 0 / 50%);
+    color: #000000;
+    font-size: 15px;
+    font-weight: 550;
+    padding: 7px 10px 4px;
+    
+}
+
+.html {
+    font-family: arial;
+    -ms-text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+}
+
+.chart-wrapper, .nav-tabs-custom, .sbframe-commentary {
+    background: #e6e6e64a;
+    border: 1px solid #090909;
+    border-radius: 3px;
+    margin-bottom: 8px;
+    margin-right: 8px;
+}
+
+
+body {
+    font-family: "arial";
+    font-size: 14px;
+    line-height: 1.7;
+    color: #333333;
+    background-color: #fff;
+}
+
+</style>  
+
+<!-- *********************************************************************** -->
+
+```{r setup, include=FALSE, warning=FALSE}
+# ******************************************************************************
+setwd(
+  paste0(
+  "/conf/LIST_analytics/Lanarkshire/Projects/Social Care/",
+  "Home_Care_Maps_Proj_2022/"
+  )
+  )
+source('Scripts/HC Outstanding Map Process - Template.R')
+```
+
+Home {data-orientation=columns; data-icon="fa-home"}
+=====================================  
+
+
+Column {.sidebar}
+-------------------------------------
+### Contact:
+
+This dashboard has been put together by LIST Lanarkshire for South Lanarkshire HSCP. We would welcome any questions or feedback.<br>
+[antony.clark2@phs.scot](mailto:antony.clark2@phs.scot) 
+[david.readhead@phs.scot](mailto:david.readhead@phs.scot)
+
+Column
+-------------------------------------
+
+### Notes
+
+Please note, this dashboard is for <b><u>Management Information Only</u></b>.
+
+This dashboard presents information on new home care requests in South Lanarkshire. It contains a map which locates home care requests, a filterable data table with key care information, as well as tables summarising over figures. Navigate to the maps and tables using the tabs at the top of the page. 
+
+The map is designed to be used alongside the "Weekly Provider Order" spreadsheet, which can help assess the practicalities of providing care and identifying clusters of care packages to minimise travel time. Please note that requests are mapped using postcodes, not exact address, therefore markers provide an **estimation** of location. 
+
+The map also provides individual-level data about each requests within a pop-up text box that appears when you click on a marker. Key points to note on this:  
+
+* Type of Referral has been grouped into three categories: Hospital, Community and Homecare Intake Team. 
+* The number of visits per day may vary, so the information presented here offers a guide of **around** how many visits are needed. It may not take into account care packages that have differing number of calls per week, nor the additional calls column. 
+* The pop-up text box on the map will state if there is a specific carer's gender requested. Nothing will display if no such request exists.
+* Some postcodes have been recoded into a format to match a longitude/latitude file. Therefore postcodes shown on the map will not match the excel file if there are coding issues. The majority of differences relate to adding a space or removing a double space.
+
+
+
+
+<i class="fas fa-map-marked"></i> South Lanarkshire Map
+=====================================  
+
+Column {.sidebar}
+-----------------------------------------------------------------------
+
+### How to use the map:
+
+* Use either the +/- buttons or scroll to zoom into the map. There is also search functionality within the map.
+* Individual care requests are displayed with a home icon. 
+* Click on the house icon to view details concerning the request, including the Order Number. 
+
+### Filters
+
+Use the tickbox filters to conditionally display data. This filter gets applied to both the map and the data table. 
+
+```{r filter_section2}
+
+filter_checkbox(
+  id = "type_of_referral",
+  label = "Referral Type",
+  sharedData = filt_hc2,
+  group = ~type_of_referral
+)
+
+
+filter_checkbox(
+  "hscp_locality",
+  "Locality",
+  filt_hc2,
+  group = ~hscp_locality
+)
+
+filter_checkbox(
+  "date2",
+  "Month",
+  sharedData = filt_hc2,
+  group = ~date2
+  )
+
+filter_checkbox(
+  "urg",
+  "Urgent",
+  filt_hc2,
+  group = ~providers_comments_start_date
+)
+
+
+```
+
+
+Row {data-width = 800} {.tabset .tabset-fade}
+-----------------------------------------------------------------------
+
+### Map
+
+
+```{r map}
+# filt_hc2 = SharedData$new(filt_hc) # from HC Outstanding Map Process
+#filt_hc %>% colnames()
+leaflet(filt_hc2) %>% 
+  addSearchOSM() %>% 
+  addProviderTiles(providers$Esri.WorldTopoMap) %>% 
+  addAwesomeMarkers(lng=~longitude, 
+                    lat=~latitude, 
+                    icon= icons_home,
+                    popup = ~tooltip) %>% 
+  addPolygons(data=shape_falk_locs,
+              fillColor = ~shape_cols(locality),
+              fillOpacity = 0.7,
+              color = "#2e2e30",
+              stroke=T,
+              weight = 2)
+
+
+```
+
+
+### Table
+
+This table displays key care requirement information and will be filtered the same as the map.
+ 
+
+```{r filterable table}
+
+
+datatable(filt_hc2, 
+          rownames = TRUE,
+          extensions = c("Scroller", "Buttons"),
+          style = "bootstrap",
+          options = list(pageLength = 20,
+                         scroller = TRUE,
+                         scrollY = 300,
+                         columnDefs = list(
+        list(
+          visible = FALSE,
+          targets = c(3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 31, 32)
+        )),
+                         dom = "Blrtip",
+          buttons = list()),
+        colnames = c("Req Date" = "date_order_received_by_cmt",
+                     "Order No." = "order_number",
+                     "Hours (Wk)" = "hours",
+                     "No. Visits (Wk)" = "number_of_visits",
+                     "No. Days (Wk)" = "days",
+                     "No. Carers" = "no_of_carers",
+                     "Postcode" = "postcode2",
+                     "Locality" = "hscp_locality"))
+
+
+```
+
+
+
+<i class="fas fa-table"></i>  Summary tables {style="position:relative;"}
+=====================================  
+
+Row {data-width=850} {.tabset .tabset-fade}
+-----------------------------------------------------------------------
+
+### Locality
+
+Note that locality has been derived from postcode, rather than using the column from the spreadsheet. This is to account for missing data and coding issues. 
+
+```{r table1, echo=FALSE, warning=FALSE, message=FALSE, out.width = '100%'}
+
+tab_loc_n_ft
+
+```
+
+
+
+### Urgent Requests
+
+Note that locality has been derived from postcode, rather than using the column from the spreadsheet. This is to account for missing data and coding issues. 
+
+```{r table2, echo=FALSE, warning=FALSE, message=FALSE, out.width = '100%'}
+
+tab_urg_ft
+
+```
+
+
+### Hours per week
+
+
+```{r table3, echo=FALSE, warning=FALSE, message=FALSE, out.width = '100%'}
+
+tab_hours_ft
+
+```
+
+### Number of Carers
+
+
+```{r table4, echo=FALSE, warning=FALSE, message=FALSE, out.width = '100%'}
+
+tab_carers_ft
+
+```
+
+
+### Number of Visits
+
+Note that number of visits per day may vary, so this table offers a guide of *around* how many visits per day and will not always be accurate in cases where there are differing number of calls per week. It does not take into account the additional call(s) column. 
+
+```{r table5, echo=FALSE, warning=FALSE, message=FALSE, out.width = '100%'}
+
+tab_visits_ft
+
+```
+
+### Number of Days
+
+In some cases, there were differing number of days per week depending on the time of visit (eg 3 AM and 7 tea visits). These cases have been grouped into the category "Variable".
+
+```{r table6, echo=FALSE, warning=FALSE, message=FALSE, out.width = '100%'}
+
+tab_days_ft
+
+```
+
+
