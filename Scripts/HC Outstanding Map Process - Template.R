@@ -1,8 +1,9 @@
 # ******************************************************************************
 
-### Home Care Requests - Mapping ##
-## Ruben Vine ##
-## Last Modified: Sept 2021 ##
+# Home Care Requests - Mapping
+# Tony Clark (March 2022 onward) based on code from Ruben Vine (last updated
+# September 2021)
+
 
 ##### Set up ######
 
@@ -38,13 +39,13 @@ locality_vector <- c('Clydesdale','Hamilton',
 # This is set in the running script, but you can use it here for testing
 
 # Set wd here if not using the other script
-wd <- paste0(
-  "/conf/LIST_analytics/Lanarkshire/Projects/Social Care/",
-  "Home_Care_Maps_Proj_2022/"
-)
-setwd(wd)
+# wd <- paste0(
+#   "/conf/LIST_analytics/Lanarkshire/Projects/Social Care/",
+#   "Home_Care_Maps_Proj_2022/"
+# )
+# setwd(wd)
 
-run_date = "15 11 21"
+#run_date = "15 11 21"
 
 # Get data ####
 # ******************************************************************************

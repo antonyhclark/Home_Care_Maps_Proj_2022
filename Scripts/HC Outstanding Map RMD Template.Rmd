@@ -76,13 +76,7 @@ body {
 
 ```{r setup, include=FALSE, warning=FALSE}
 # ******************************************************************************
-setwd(
-  paste0(
-  "/conf/LIST_analytics/Lanarkshire/Projects/Social Care/",
-  "Home_Care_Maps_Proj_2022/"
-  )
-  )
-source('Scripts/HC Outstanding Map Process - Template.R')
+# source('Scripts/HC Outstanding Map Process - Template.R')
 ```
 
 Home {data-orientation=columns; data-icon="fa-home"}

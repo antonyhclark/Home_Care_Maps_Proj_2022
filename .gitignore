@@ -7,6 +7,9 @@ docs/*.msg
 # Real data
 Data/
 
+# Real Outputs
+Outputs/
+
 # Output html
 Scripts/*.html
 Scripts/*.zip
