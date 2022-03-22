@@ -1,3 +1,9 @@
+# Windows shortcuts
+*/*.lnk
+
+# Emails
+docs/*.msg
+
 # Real data
 Data/
 
